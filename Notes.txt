@@ -1,0 +1,72 @@
+Project:
+For this project we will focus on organizing the phenotypic metadata of
+clinical isolates (without worrying about the genomic sequencing information). There are two csv files
+provided, and the goal is to write a pipeline that ingests these csv’s, parses any necessary columns, and
+reorganizes them into tables that are more intuitive for downstream applications.
+
+Blood sample -> cultured -> isolates -> phenotypic testing -> identification & resistances 
+Resistant, suscpeptible, intermediate. 
+Information about each isolate is stored by EHR w/ custom formatting scheme. 
+
+• HID: Hospital Identifier. HID+Isolate are both needed to uniquely identify a single isolate.
+• Isolate: Isolate identifier. There can be multiple isolates for a given HID, so HID+Isolate uniquely
+	identify an isolate. ISO1 indicates Isolate 1, ISO2 Isolate 2, etc.
+• Received: Date received
+• Organism: Species identified for the isolate
+
+Multiple isolates for given sample, same isolate # might be tested against multiple antibiotics 
+
+DZD must actually physically receive clinical isolates from the hospital in order to
+perform genomic sequencing on them, and then be able to know which rows of the phenotype
+metadata table correspond to which collected isolate. 
+
+CollectionCsv corresponds to PhenotypeData via the HID, which corresponds to a unique DZD id: sampid
+
+• The most important aspects for downstream applications are the use of the DZD ID, the species,
+and the resistance interpretations across the tested drugs
+	This might be hint at basic table structure 
+• There may be some parsing necessary – how to save raw / intermediate data?
+	temporary table? Not sure 
+• How can the process ensure robustness to different spellings and abbreviations, e.g.
+“Trimeth/Sulfa” and “Trimethoprim/Sulfa” are both abbreviations for the antibiotic
+“Trimethoprim/Sulfamethoxazole”.
+	Regex might work 
+• Note that not all collected isolates may be represented yet in the phenotypic data (data dumps
+are received from the hospital at regular intervals), and not all phenotypic data may correspond
+to collected isolates. 
+	There will be some data points that do not have matches. This means some entries will be 'incomplete'
+	within the standard db structure thats set up. 
+
+Important columns: PhenotypeData.csv: 
+			HID, Isolate, Organism, Test, Antibiotic, Value, AntibioticInterpretation
+Sub columns: 		Received, Source, Method?
+
+Important columns: CollectionsData.csv: 
+		   sampid, HID, Isolate
+Sub columns: 	   DateCollected
+
+Note: There are duplicate entries in CollectionsData.csv with different sampids
+The important thing from CollectionsData.csv is extracting the sampid and matching it to the HID
+
+Isolate blanks should switch to 1
+Should CollectionsData.csv duplicates just be ignored? 
+Because sampid corresponds to a unique HID/Isolate, its not needed in the PrimaryTable
+
+
+General Idea:
+Publish data to Postgres tables
+
+
+The data needs to be cleaned...
+Make sure HID are in proper format, make sure isolate values do not have decimals.. etc
+
+
+Collections: 1648
+Phenotype: 56372
+Organisms: 56372
+TestAggregate: 24003
+
+
+It may be prudent to manipulate the data before pushing it to the sql table
+
+ 

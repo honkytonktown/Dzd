@@ -1,0 +1,114 @@
+ALTER TABLE public."PhenotypeData"
+ADD COLUMN hid integer,
+ADD COLUMN isolate varchar,
+ADD COLUMN received varchar,
+ADD COLUMN organism varchar,
+ADD COLUMN source varchar,
+ADD COLUMN antibiotic varchar,
+ADD COLUMN antibioticInterpretation varchar,
+ADD COLUMN method varchar;
+
+
+ALTER TABLE public."CollectionsData"
+ADD COLUMN sampid varchar,
+ADD COLUMN hid integer,
+ADD COLUMN isolate integer,
+ADD COLUMN datecollected varchar; 
+
+
+SELECT *
+	INTO public."TestJoin"
+	FROM public."PhenotypeData";
+	
+SELECT sampid, public."CollectionsData".hid, public."CollectionsData".isolate
+	FROM public."CollectionsData"
+	
+JOIN public."PhenotypeData" ON (public."PhenotypeData".hid = public."CollectionsData".hid);
+
+INSERT INTO public."TestJoin" (sampid, hid, isolate)	
+SELECT sampid, public."CollectionsData".hid, public."CollectionsData".isolate
+	FROM public."CollectionsData"
+JOIN public."PhenotypeData" ON (public."PhenotypeData".hid = public."CollectionsData".hid 
+								AND public."PhenotypeData".isolate = public."CollectionsData".isolate );
+
+ALTER TABLE table_name
+ALTER COLUMN column_name [SET DATA] TYPE new_data_type;
+
+ALTER TABLE public."TestResistance"
+ADD COLUMN sampid varchar,
+ADD COLUMN test varchar,
+ADD COLUMN antibiotic varchar,
+ADD COLUMN value varchar,
+ADD COLUMN antibioticinterpretation varchar,
+ADD COLUMN method varchar;
+
+INSERT INTO public."TestResistance" (sampid, organism, test, antibiotic, value, antibioticinterpretation, method)	
+SELECT sampid, 
+	   public."PhenotypeData".organism
+	   public."PhenotypeData".test, 
+	   public."PhenotypeData".antibiotic, 
+	   public."PhenotypeData".value, 
+	   public."PhenotypeData".antibioticinterpretation, 
+	   public."PhenotypeData".method
+FROM public."CollectionsData"
+
+JOIN public."PhenotypeData" ON (public."PhenotypeData".hid = public."CollectionsData".hid 
+								AND public."PhenotypeData".isolate = public."CollectionsData".isolate );
+
+SELECT public."PhenotypeData".organism, 
+	   public."PhenotypeData".test, 
+	   public."PhenotypeData".antibiotic, 
+	   public."PhenotypeData".value, 
+	   public."PhenotypeData".antibioticinterpretation, 
+	   public."PhenotypeData".method
+INTO public."TestOrganism"	
+FROM public."PhenotypeData"
+
+
+
+INSERT INTO public."MainTable" (sampid, organism)
+SELECT DISTINCT sampid, 
+	   public."PhenotypeData".organism
+FROM public."CollectionsData"
+
+INNER JOIN public."PhenotypeData" ON (public."PhenotypeData".hid = public."CollectionsData".hid 
+								AND public."PhenotypeData".isolate = public."CollectionsData".isolate );
+
+
+INSERT INTO public."TestAggregate" (sampid, organism, hid, isolate)
+SELECT sampid, public."CollectionsData".hid , public."CollectionsData".isolate,  
+	   public."PhenotypeData".organism
+FROM public."CollectionsData"
+
+INNER JOIN public."PhenotypeData" ON (public."PhenotypeData".hid = public."CollectionsData".hid 
+								AND public."PhenotypeData".isolate = public."CollectionsData".isolate );
+
+SELECT * FROM public."PhenotypeData" WHERE hid LIKE '%8900859894622380000%"
+
+
+
+
+INSERT INTO public."MainTableAll" (sampid, organism)
+SELECT sampid, 
+public."PhenotypeData".organism
+
+FROM public."CollectionsData"
+
+LEFT JOIN public."PhenotypeData" ON (public."PhenotypeData".hid = public."CollectionsData".hid 
+								AND public."PhenotypeData".isolate = public."CollectionsData".isolate ); 
+
+
+								INSERT INTO public."MainTable" (sampid, organism)
+SELECT sampid, 
+public."PhenotypeData".organism
+
+FROM public."CollectionsData"
+
+INNER JOIN public."PhenotypeData" ON (public."PhenotypeData".hid = public."CollectionsData".hid 
+								AND public."PhenotypeData".isolate = public."CollectionsData".isolate ); 
+
+
+INSERT INTO public."MainTableNulls" (sampid, organism)
+SELECT *
+FROM public."MainTableAll"
+WHERE organism IS NULL
