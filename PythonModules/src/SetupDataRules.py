@@ -5,12 +5,14 @@ import Config.Config as config
 import pandas as pd
 import Tables.CreateMatchRules as MRtable
 
+#createDataTable creates SQL table that will hold data matching rules
 def createDataTable():
     cur = config.conn.cursor()
     cmd = MRtable.createTable
     cur.execute(cmd)
     config.conn.commit()
 
+#insertData inserts data into data matching table
 def insertData(row):
     cur = config.conn.cursor()
     SQLInsert = """ INSERT INTO public."MatchingRules"(columnname, replacementphrase, regexpattern) VALUES (%s, %s, %s); """
@@ -19,13 +21,20 @@ def insertData(row):
     config.conn.commit()
 
 #pushData iterates over df rows and calls insertData
-#to insert them into sql table
+#to insert them into SQL table
 def pushData(df):
     for i,row in df.iterrows():
         insertData(row)
 
+#pushMatchingRules defines and then handles data matching rules.
+#These rules are stored and then pulled when formatting CSV data later
+#As wil the DZD rules table, you'd want to define these elsewhere in 
+#production
 def pushMatchingRules(mode): 
     print("Setting up data matching rules...")
+    #You'd probably want a different insertion method,
+    #but of that implementation would be easy.
+    #Define rules -> insert into SQL table
     matchDictionary = {
     'columnname': ['antibiotic'],
     'replacementphrase': ['Trimethoprim/Sulfamethoxazole'],

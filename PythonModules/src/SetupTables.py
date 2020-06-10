@@ -25,8 +25,7 @@ def createMainAggregate():
     config.conn.commit()
 
 #createMainNulls creates table w/ sampid, organism (with null organisms)
-#This would be the table full of sampids that didn't match anything in
-#the phenotype data set
+#This table is full of sampids that didn't match anything in the phenotype data set
 def createMainNull():
     cur = config.conn.cursor()
     cmd = mt.MainTableNulls
@@ -61,8 +60,8 @@ def tableHandler(mode):
     print("Generating SQL tables...")
     if (mode == 1):
         createMain()
-        #createMainAggregate needs to be built before
-        #MainNull because it builds off it
+        #MainAggregate needs to be built before
+        #MainNull because it builds from it
         createMainAggregate()
         createMainNull()
         createAggregate()

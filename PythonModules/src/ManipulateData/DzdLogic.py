@@ -1,73 +1,84 @@
 #Dzd specific rules
     #determine what signs mean
-    #extract the import values out
-    #if it contains <= x then 
-    #apply new rules
+    #extract the numerical values out
     
+    #When organism == Escherichia coli
     #If Value <=4: Susceptible
-    # If 4 < Value < 16: Intermediate
+    #If 4 < Value < 16: Intermediate
     #If Value >=16: Resistant
 
 import re
 import pandas as pd
 
 def setResponse(value, dfRuleSet):
-    #if value '>x', add 0.1 to x
-    #if value '<x', less 0.1 from x
-    #if value '>4', the value would register as 4
-    #but in reality its something greater than 4
-    temp = float(value)
     if not dfRuleSet.empty:
         susceptible = float(dfRuleSet['susceptible'].values[0])
         intermediatelow = float(dfRuleSet['intermediatelow'].values[0])
         intermediatehigh = float(dfRuleSet['intermediatehigh'].values[0])
         resistant = float(dfRuleSet['resistant'].values[0])
-        if (temp <= susceptible):
+        if (value <= susceptible):
             return responses[0]
-        elif(temp > intermediatelow and temp < intermediatehigh):
+        elif(value > intermediatelow and value < intermediatehigh):
             return responses[1]
-        elif(temp >= resistant):
+        elif(value >= resistant):
             return responses[2]
-
     #if there is no rule set, return there is no match
     else:
         return responses[3]
 
 def extractNum(value):
     #print(value)
+    #this regex finds integers and floats in provided string
     numValue = re.search(r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?', value).group(1)
-    if numValue is None:
+    if numValue is not None:
+         return numValue
+    else: 
         #This should not happen
         return "NaN"
-    else: 
-        return numValue
 
-def inequalityLessThan(value, dfRuleSet):
+def lessThan(value, dfRuleSet):
+    temp = extractNum(value)
+    temp = float(value)
+    #<4 returns 4, so need to reduce value slightly
+    #for inequality to remain true (ie. 4 < 4 is false)
+    temp = temp - 0.01  
+    return setResponse(temp, dfRuleSet)
+
+def greaterThan(value, dfRuleSet):
+    temp = extractNum(value)
+    temp = float(value)
+    #>4 returns 4, so need to bump value slightly
+    #for inequality to remain true
+    temp = temp + 0.01  
+    return setResponse(temp, dfRuleSet)     
+
+def lessThanOrEqual(value, dfRuleSet):
     temp = extractNum(value)   
     return setResponse(temp, dfRuleSet)
 
-def inequalityGreaterThan(value, dfRuleSet):
+def greaterThanOrEqual(value, dfRuleSet):
     temp = extractNum(value)
-    return setResponse(temp, dfRuleSet)     
 
+    return setResponse(temp, dfRuleSet)   
 def numWithUnits(value, dfRuleSet):
     temp = extractNum(value)
     return setResponse(temp, dfRuleSet) 
 
 def funcMap(value, id, dfRuleSet):
     if id == 0:
-       return inequalityLessThan(value, dfRuleSet)
+       return lessThanOrEqual(value, dfRuleSet)
     elif id == 1:
-       return inequalityGreaterThan(value, dfRuleSet)
+       return greaterThanOrEqual(value, dfRuleSet)
     elif id == 2:
-      return  inequalityLessThan(value, dfRuleSet)
+      return  lessThan(value, dfRuleSet)
     elif id == 3:
-       return inequalityGreaterThan(value, dfRuleSet)
+       return greaterThan(value, dfRuleSet)
     elif id == 4:
        return numWithUnits(value, dfRuleSet)
 
 responses = ["Susceptible", "Intermediate", "Resistant", "No matching rule"]
 
+#common 'value' formats
 regexArray = [
     [re.compile(r'[<=]'), 0],
     [re.compile(r'[>=]'), 1],

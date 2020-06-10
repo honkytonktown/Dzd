@@ -3,6 +3,7 @@ import Config.Config as config
 import DataHelper.ApplyRules
 import pandas as pd
 
+#getMatchingRules pulls the matching rules table from db and saves them in a dataframe
 def getMatchingRules():
     SQLSelect = pd.read_sql_query(""" SELECT * FROM public."MatchingRules" """, config.conn)
     dfRules = pd.DataFrame(SQLSelect, columns=['columnname','replacementphrase', 'regexpattern'])
@@ -17,14 +18,27 @@ def removeISO(item):
 def formatColsPheno(df): 
     df.columns = ["hid", "isolate", "received", "organism", "source", "test","antibiotic", "value", "antibioticinterpretation", "method"]
 
+#formatRowsPheno begins applying the matching rules. This is where table from SetupDataRules.py
+#is used. If the cell is in an antibiotic column, use rules that are specific
+#to antibiotics when it goes into the ApplyRules.handler function.
+#If its an organism cell... etc...
+#It then converts to strings and removes whitespaces
+#see: ApplyRules.handler
 def formatRowsPheno(df, dfRules): 
     df['isolate'] = df['isolate'].apply(removeISO)
-    #df = df.applymap(lambda x: DataHelper.ApplyRules.handler(x, dfRules))
-    df['antibiotic'] = df['antibiotic'].apply(lambda x: DataHelper.ApplyRules.handler(x, dfRules, 'antibiotic'))
-    df['organism'] = df['organism'].apply(lambda x: DataHelper.ApplyRules.handler(x, dfRules, 'organism'))
+
+    #moving this out here to reduce load in DataHelper.ApplyRules
+    dfRuleSet = dfRules.loc[(dfRules['columnname'] == 'antibiotic')]
+    df['antibiotic'] = df['antibiotic'].apply(lambda x: DataHelper.ApplyRules.matchRules(x, dfRuleSet))
+
+    dfRuleSet = dfRules.loc[(dfRules['columnname'] == 'organism')]
+    df['organism'] = df['organism'].apply(lambda x: DataHelper.ApplyRules.matchRules(x, dfRuleSet))
+
     df = df.astype(str)
     df = df.apply(lambda x: x.str.strip())
 
+#dataHandlerPheno handles the process of cleaning the data
+#set column names and apply cell rules. 
 def dataHandlerPheno(df):
     dfRules = getMatchingRules()
     formatColsPheno(df)
