@@ -41,8 +41,7 @@ def pushMatchingRules(mode):
     'regexpattern': ['/.*\\b(Trimeth.*|Sulfa.*)\\b.*'] 
     }
     df = pd.DataFrame(data=matchDictionary)
-    df = df.astype(str)
-    df = df.apply(lambda x: x.str.strip())
+    df = df.applymap(lambda x: x.strip())
 
     if(mode == 0):
         print(df)

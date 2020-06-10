@@ -16,6 +16,10 @@ def insertData(row):
     cur.execute(SQLInsert, data) 
     config.conn.commit()
 
+def getModifiedData(): 
+    SQLSelect = pd.read_sql_query(""" SELECT * FROM public."AggregateTests" """, config.conn)
+    df = pd.DataFrame(SQLSelect, columns=['sampid', 'organism','test','antibiotic','value', 'antibioticinterpretation', 'method', 'dzdinterpretation'])
+    return df
 #getData pulls data from sql table for manipulation
 def getData():
     SQLSelect = pd.read_sql_query(""" SELECT * FROM public."AggregateTests" """, config.conn)
@@ -64,19 +68,46 @@ def pushData(df):
 #if mode == 0 itll pull data, and modify the dataframe only
 def dataHandler(mode):
     #pd.set_option('display.max_rows', None)
-    df = getData()
-    dfRules = getDzdRules()
-    print("Dataframe column names: ")
-    print(df.columns.values)
 
-    print("Creating new column with Dzd modification...")
-    generateDzdValues(df, dfRules)
-    #pd.set_option('display.max_rows', None)
-    #print(df)
-    if (mode == 1):
-        alterTable()
+    #pull modified data, dont push back
+    if (mode == 0):
+        df = getData()
+        dfRules = getDzdRules()
+        print("Dataframe column names: ")
+        print(df.columns.values)
+        generateDzdValues(df, dfRules)
+        print(df)
+        config.CloseConnection()
+
+    #pull modified data, push back
+    elif (mode == 1):
+        df = getModifiedData()
+        dfRules = getDzdRules()
+        print("Dataframe column names: ")
+        print(df.columns.values)
+        generateDzdValues(df, dfRules)
+        clearTable()
         pushData(df)
         config.CloseConnection()
+
+    #pull original data, push back
+    elif(mode == 2):
+        df = getData()
+        dfRules = getDzdRules()
+        print("Dataframe column names: ")
+        print(df.columns.values)
+        print("Creating new column with Dzd modification...")
+        generateDzdValues(df, dfRules)
+        alterTable()
+        generateDzdValues(df, dfRules)
+        print("Modified dataframe column names: ")
+        print(df.columns.values)
+        clearTable()
+        pushData(df)
+        config.CloseConnection()
+    #pd.set_option('display.max_rows', None)
+
+        
 
 
 

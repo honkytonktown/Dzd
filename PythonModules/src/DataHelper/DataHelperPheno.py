@@ -35,7 +35,7 @@ def formatRowsPheno(df, dfRules):
     df['organism'] = df['organism'].apply(lambda x: DataHelper.ApplyRules.matchRules(x, dfRuleSet))
 
     df = df.astype(str)
-    df = df.apply(lambda x: x.str.strip())
+    df = df.applymap(lambda x: x.strip())
 
 #dataHandlerPheno handles the process of cleaning the data
 #set column names and apply cell rules. 

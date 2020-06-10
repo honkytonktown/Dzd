@@ -15,5 +15,5 @@ def dataHandlerColl(df):
     formatColsColl(df)
     formatRowsColl(df)
     df = df.astype(str)
-    df = df.apply(lambda x: x.str.strip())
+    df = df.applymap(lambda x: x.strip())
     return df

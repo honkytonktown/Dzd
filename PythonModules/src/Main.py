@@ -23,9 +23,9 @@ def setupRules(mode):
 #once csv data is inserted, other SQL tables are built off the inserted data
 def setupSQLTables(mode):
     print("Starting initial setup...")
-    #InitialImport.UploadCollData.collDataHandler(mode, collCSV)
+    InitialImport.UploadCollData.collDataHandler(mode, collCSV)
     InitialImport.UploadPhenoData.phenoDataHandler(mode, phenoCSV)
-    #SetupTables.tableHandler(mode)
+    SetupTables.tableHandler(mode)
     print("Done initializing data and SQL tables")
 
 #manipulateData is where you'd existing data
@@ -38,8 +38,8 @@ def manipulateData(mode):
 
 def main():
     #setupRules(2)
-    setupSQLTables(0)
-    #manipulateData(0)
+    #setupSQLTables(1)
+    manipulateData(1)
     config.CloseConnection()
     print("Process done")
 

@@ -31,71 +31,84 @@ def extractNum(value):
     #this regex finds integers and floats in provided string
     numValue = re.search(r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?', value).group(1)
     if numValue is not None:
-         return numValue
+        return numValue
     else: 
         #This should not happen
         return "NaN"
 
 def lessThan(value, dfRuleSet):
     temp = extractNum(value)
-    temp = float(value)
+    tempF = float(temp)
     #<4 returns 4, so need to reduce value slightly
     #for inequality to remain true (ie. 4 < 4 is false)
-    temp = temp - 0.01  
-    return setResponse(temp, dfRuleSet)
+    tempF = tempF - 0.01  
+    return setResponse(tempF, dfRuleSet)
 
 def greaterThan(value, dfRuleSet):
     temp = extractNum(value)
-    temp = float(value)
+    tempF = float(temp)
     #>4 returns 4, so need to bump value slightly
     #for inequality to remain true
-    temp = temp + 0.01  
-    return setResponse(temp, dfRuleSet)     
+    tempF = tempF + 0.01  
+    return setResponse(tempF, dfRuleSet)     
 
 def lessThanOrEqual(value, dfRuleSet):
-    temp = extractNum(value)   
-    return setResponse(temp, dfRuleSet)
+    temp = extractNum(value)
+    tempF = float(temp)
+    return setResponse(tempF, dfRuleSet)
 
 def greaterThanOrEqual(value, dfRuleSet):
     temp = extractNum(value)
+    tempF = float(temp)
+    return setResponse(tempF, dfRuleSet)  
 
-    return setResponse(temp, dfRuleSet)   
 def numWithUnits(value, dfRuleSet):
     temp = extractNum(value)
-    return setResponse(temp, dfRuleSet) 
+    tempF = float(temp)
+    return setResponse(tempF, dfRuleSet) 
 
 def funcMap(value, id, dfRuleSet):
     if id == 0:
-       return lessThanOrEqual(value, dfRuleSet)
+        response = lessThanOrEqual(value, dfRuleSet)
+        return response
     elif id == 1:
-       return greaterThanOrEqual(value, dfRuleSet)
+        response = greaterThanOrEqual(value, dfRuleSet)
+        return response
     elif id == 2:
-      return  lessThan(value, dfRuleSet)
+        response = lessThan(value, dfRuleSet)
+        return response
     elif id == 3:
-       return greaterThan(value, dfRuleSet)
+        response = greaterThan(value, dfRuleSet)
+        return response 
     elif id == 4:
-       return numWithUnits(value, dfRuleSet)
+        response = numWithUnits(value, dfRuleSet)
+        return response
 
-responses = ["Susceptible", "Intermediate", "Resistant", "No matching rule"]
+responses = ["Susceptible", "Intermediate", "Resistant", "No matching rule", "Value has no nums"]
 
 #common 'value' formats
 regexArray = [
-    [re.compile(r'[<=]'), 0],
-    [re.compile(r'[>=]'), 1],
-    [re.compile(r'[<]'), 2],
-    [re.compile(r'[>]'), 3],
-    [re.compile(r'/(?=.*ug.*)'), 4]
+    [re.compile(r'(<=.*)'), 0],
+    [re.compile(r'(>=.*)'), 1],
+    [re.compile(r'<(\?!=)'), 2],
+    [re.compile(r'>(\?!=)'), 3],
+    [re.compile(r'(?=.*ug.*)'), 4]
 ]
 
 def applyLogic(value, organism, method, antibiotic, dfRules):
     #selecting appropriate rule for the current row
     dfRuleSet = dfRules.loc[(dfRules['organism'] == organism) & (dfRules['antibiotic'] == antibiotic) & (dfRules['method'] == method)]
+    # if not dfRuleSet.empty:
+    #     print (dfRuleSet)
     #if str contains no nums return immediately
     if value.isalpha():
-        return responses[3]
+        return responses[4]
     #if str contains only nums jump to setResponse
     if value.isnumeric():
-        return setResponse(value, dfRuleSet)
+        temp = extractNum(value)
+        tempF = float(temp)
+        response = setResponse(tempF, dfRuleSet)
+        return setResponse(tempF, dfRuleSet)
 
     #regex[0] is regex pattern
     #regex[1] is mapper identification num

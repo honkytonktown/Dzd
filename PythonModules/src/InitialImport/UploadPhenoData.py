@@ -38,7 +38,7 @@ def phenoDataHandler(mode, CsvPath):
     print (msg)
 
     try: 
-        df = pd.read_csv(os.path.join(CsvPath))
+        df = pd.read_csv(os.path.join(CsvPath), skipinitialspace=True)
     except IOError as e:
         print (e)
         raise

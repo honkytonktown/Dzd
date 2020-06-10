@@ -43,7 +43,7 @@ def pushDzdRules(mode):
      }
     df = pd.DataFrame(data=dzdDictionary)
     df = df.astype(str)
-    df = df.apply(lambda x: x.str.strip())
+    df = df.applymap(lambda x: x.strip())
 
     if(mode == 0):
         print(df)
