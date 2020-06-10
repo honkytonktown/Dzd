@@ -2,7 +2,7 @@
 
 import os
 import psycopg2
-import Config as config
+import Config.Config as config
 import csv
 import pandas as pd
 import Tables.CreateCollData
@@ -33,6 +33,7 @@ def createTable(df):
 #if mode == 1, it will read, format csv and push the data to a sql table
 #if mode == 0 itll read, format and print csv data
 def collDataHandler(mode, CsvPath):
+    print("Uploading CollectionsData...")
     msg = "The clctDataHandler is set to mode: {}".format(mode)
     print (msg)
 
@@ -61,7 +62,7 @@ def collDataHandler(mode, CsvPath):
         createTable(df)
         print("Pushing data to SQL db...")
         pushData(df, Columns)
-        config.CloseConnection()
+    print("Done uploading CollectionsData")
 
     
 

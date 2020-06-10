@@ -6,15 +6,15 @@ import pandas as pd
 import Tables.CreateMatchRules as MRtable
 
 def createDataTable():
-    cmd = MRtable.createTable
     cur = config.conn.cursor()
+    cmd = MRtable.createTable
     cur.execute(cmd)
     config.conn.commit()
 
 def insertData(row):
     cur = config.conn.cursor()
-    SQLInsert = """ INSERT INTO public."MatchingRules"(replacementphrase, regexpattern) VALUES (%s, %s); """
-    data = (row[0], row[1])
+    SQLInsert = """ INSERT INTO public."MatchingRules"(columnname, replacementphrase, regexpattern) VALUES (%s, %s, %s); """
+    data = (row[0], row[1], row[2])
     cur.execute(SQLInsert, data) 
     config.conn.commit()
 
@@ -25,19 +25,22 @@ def pushData(df):
         insertData(row)
 
 def pushMatchingRules(mode): 
+    print("Setting up data matching rules...")
     matchDictionary = {
-     'replacementphrase': ['Trimethoprim/Sulfamethoxazole', 'Trimethoprim/Sulfamethoxazole'],
-     'regexpattern': ['Trimeth', 'Sulfa'] 
-     }
+    'columnname': ['antibiotic'],
+    'replacementphrase': ['Trimethoprim/Sulfamethoxazole'],
+    'regexpattern': ['/.*\\b(Trimeth.*|Sulfa.*)\\b.*'] 
+    }
     df = pd.DataFrame(data=matchDictionary)
-    
+    df = df.astype(str)
+    df = df.apply(lambda x: x.str.strip())
+
     if(mode == 0):
         print(df)
     elif(mode == 1):
         pushData(df)
-        config.CloseConnection()
     elif(mode == 2):
         createDataTable()
         pushData(df)
-        config.CloseConnection()
+    print("Done setting up data rules table")
     

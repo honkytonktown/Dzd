@@ -5,8 +5,8 @@ import pandas as pd
 import Tables.CreateDzdRules as DZDtable
 
 def createDzdTable():
-    cmd = DZDtable.createTable
     cur = config.conn.cursor()
+    cmd = DZDtable.createTable
     cur.execute(cmd)
     config.conn.commit()
 
@@ -24,24 +24,25 @@ def pushData(df):
         insertData(row)
 
 def pushDzdRules(mode): 
+    print("Setting up dzd specific rules...")
     dzdDictionary = {
-     'organism': ['Escherichia coli'],
-     'susceptible': ['4'],  
-     'intermediatelow': ['4.01'],
-     'intermediatehigh': ['16'], 
-     'resistant': ['16.01'],  
-     'antibiotic': ['Ceftazidime'],  
-     'method': ['VITEK II']
+     'organism': ['Escherichia coli', 'Staphylococcus capitis'], 
+     'susceptible': ['4', '4'],  
+     'intermediatelow': ['4', '4'],
+     'intermediatehigh': ['16', '16'], 
+     'resistant': ['16', '16'],  
+     'antibiotic': ['Ceftazidime', 'Penicillin G'],  
+     'method': ['VITEK II', 'VITEK II']
      }
     df = pd.DataFrame(data=dzdDictionary)
+    df = df.astype(str)
+    df = df.apply(lambda x: x.str.strip())
 
     if(mode == 0):
         print(df)
     elif(mode == 1):
         pushData(df)
-        config.CloseConnection()
     elif(mode == 2):
         createDzdTable()
         pushData(df)
-        config.CloseConnection()
-
+    print("Done setting up dzd rules table")

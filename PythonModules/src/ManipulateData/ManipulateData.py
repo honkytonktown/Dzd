@@ -69,9 +69,9 @@ def dataHandler(mode):
     print("Dataframe column names: ")
     print(df.columns.values)
 
-    print("Creating new column with DZD modification")
+    print("Creating new column with Dzd modification...")
     generateDzdValues(df, dfRules)
-
+    #pd.set_option('display.max_rows', None)
     #print(df)
     if (mode == 1):
         alterTable()

@@ -3,13 +3,14 @@ MainTable = """
 CREATE TABLE public."MainTable"
 (
     sampid character varying COLLATE pg_catalog."default",
-    organism character varying COLLATE pg_catalog."default",
+    organism character varying COLLATE pg_catalog."default"
 )
 
 TABLESPACE pg_default; 
+
 """
 
-insertData = """ 
+InsertData = """ 
 INSERT INTO public."MainTable" (sampid, organism)
 SELECT DISTINCT sampid, 
 	   public."PhenotypeData".organism
@@ -22,7 +23,7 @@ MainTableAgg = """
 CREATE TABLE public."MainTableAll"
 (
     sampid character varying COLLATE pg_catalog."default",
-    organism character varying COLLATE pg_catalog."default",
+    organism character varying COLLATE pg_catalog."default"
 )
 
 TABLESPACE pg_default; 
@@ -44,7 +45,7 @@ MainTableNulls = """
 CREATE TABLE public."MainTableNulls"
 (
     sampid character varying COLLATE pg_catalog."default",
-    organism character varying COLLATE pg_catalog."default",
+    organism character varying COLLATE pg_catalog."default"
 )
 
 TABLESPACE pg_default; 

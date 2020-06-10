@@ -2,7 +2,7 @@
 
 import os
 import psycopg2
-import Config as config
+import Config.Config as config
 import csv
 import pandas as pd
 import Tables.CreatePhenoTable
@@ -33,6 +33,7 @@ def createTable(df):
 #if mode == 1, it will read, format csv and push the data to a sql table
 #if mode == 0 itll simply read, format and print csv data
 def phenoDataHandler(mode, CsvPath):
+    print("Uploading PhenotypeData...")
     msg = "The phenoDataHandler is set to mode: {}".format(mode)
     print (msg)
 
@@ -62,5 +63,5 @@ def phenoDataHandler(mode, CsvPath):
         createTable(df)
         print("Pushing data to SQL db...")
         pushData(df)
-        config.CloseConnection()
+    print("Done uploading PhenotypeData")
 
