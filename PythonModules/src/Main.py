@@ -9,8 +9,9 @@ import Config.Config as config
 
 phenoCSV = ""
 collCSV = ""
-phenoCSV = 'C:\\Users\\j839602\\Desktop\\SampleProject\\CsvFiles\\PhenotypeData.csv'
-collCSV = 'C:\\Users\\j839602\\Desktop\\SampleProject\\CsvFiles\\CollectionsData.csv'
+#normally you'd pass these in via cmd line
+phenoCSV = 'C:\\path\\to\\PhenotypeData.csv'
+collCSV = 'C:\\path\\to\\CollectionsData.csv'
 
 #setupRules creates sql tables to hold data rules that are applied later
 #mode - 0 = print rules, 1 = insert rules, 2 = createtable + insert
@@ -28,7 +29,6 @@ def importCSVData(mode):
     InitialImport.UploadPhenoData.phenoDataHandler(mode, phenoCSV)
 
     print("Data has been imported into postgres DB")
-
 
 #setupSQLTables creates additional tables from existing SQL data
 #mode - 0 = nothing, 1 = creates tables
@@ -55,11 +55,12 @@ def dropTables(mode):
     print("Tables dropped")
 
 def main():
-    #setupRules(2)
-    #importCSVData(1)
-    #setupSQLTables(1)
-    #manipulateData(1) 
-    #dropTables(1)
+    setupRules(2)
+    importCSVData(1)
+    setupSQLTables(1)
+    manipulateData(2) 
+
+    #dropTables(1) #enable this to drop all tables
     config.CloseConnection()
     print("Process done")
 

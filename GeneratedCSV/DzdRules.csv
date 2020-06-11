@@ -1,0 +1,3 @@
+"organism","susceptible","intermediatelow","intermediatehigh","resistant","antibiotic","method"
+"Escherichia coli","4","4","16","16","Ceftazidime","VITEK II"
+"Staphylococcus capitis","4","4","16","16","Penicillin G","VITEK II"

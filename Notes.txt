@@ -49,17 +49,13 @@ Note: There are duplicate entries in CollectionsData.csv with different sampids
 The important thing from CollectionsData.csv is extracting the sampid and matching it to the HID
 
 Isolate blanks should switch to 1
-Should CollectionsData.csv duplicates just be ignored? 
 Because sampid corresponds to a unique HID/Isolate, its not needed in the PrimaryTable
-
 
 General Idea:
 Publish data to Postgres tables
 
-
 The data needs to be cleaned...
 Make sure HID are in proper format, make sure isolate values do not have decimals.. etc
-
 
 Collections: 1648
 Phenotype: 56372

@@ -1,0 +1,2 @@
+"columnname","replacementphrase","regexpattern"
+"antibiotic","Trimethoprim/Sulfamethoxazole","/.*\b(Trimeth.*|Sulfa.*)\b.*"
