@@ -8,16 +8,25 @@ import Tables.CreateDzdRules as DZDtable
 def createDzdTable():
     cur = config.conn.cursor()
     cmd = DZDtable.createTable
-    cur.execute(cmd)
-    config.conn.commit()
+    try:
+        cur.execute(cmd)
+        config.conn.commit()
+    except Exception as err:
+        print(err)
+        config.conn.rollback()
+    
 
 #insertData inserts data into dzd rules SQL table
 def insertData(row):
     cur = config.conn.cursor()
     SQLInsert = """ INSERT INTO public."DzdRules"(organism, susceptible, intermediatelow, intermediatehigh, resistant, antibiotic, method) VALUES (%s, %s, %s, %s, %s, %s, %s); """
     data = (row[0], row[1], row[2], row[3], row[4], row[5], row[6])
-    cur.execute(SQLInsert, data) 
-    config.conn.commit()
+    try:
+        cur.execute(SQLInsert, data) 
+        config.conn.commit()
+    except Exception as err:
+        print(err)
+        config.conn.rollback()
 
 #pushData iterates over df rows and calls insertData
 #to insert them into SQL table

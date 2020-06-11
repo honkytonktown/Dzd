@@ -3,27 +3,37 @@
 
 import Config.Config as config
 import pandas as pd
+import psycopg2
 import Tables.CreateMatchRules as MRtable
 
 #createDataTable creates SQL table that will hold data matching rules
 def createDataTable():
     cur = config.conn.cursor()
     cmd = MRtable.createTable
-    cur.execute(cmd)
-    config.conn.commit()
+    try:
+        cur.execute(cmd)
+        config.conn.commit()
+    except Exception as err:
+        print(err)
+        config.conn.rollback()
 
 #insertData inserts data into data matching table
 def insertData(row):
     cur = config.conn.cursor()
     SQLInsert = """ INSERT INTO public."MatchingRules"(columnname, replacementphrase, regexpattern) VALUES (%s, %s, %s); """
     data = (row[0], row[1], row[2])
-    cur.execute(SQLInsert, data) 
-    config.conn.commit()
+    try:
+        cur.execute(SQLInsert, data) 
+        config.conn.commit()
+    except Exception as err:
+        print(err)
+        config.conn.rollback()
+        
 
 #pushData iterates over df rows and calls insertData
 #to insert them into SQL table
 def pushData(df):
-    for i,row in df.iterrows():
+    for i, row in df.iterrows():
         insertData(row)
 
 #pushMatchingRules defines and then handles data matching rules.

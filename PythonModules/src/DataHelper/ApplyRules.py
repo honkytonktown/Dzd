@@ -9,7 +9,6 @@ import re
 #row[0] == column type
 #row[1] == replacement phrase
 #row[2] == regex pattern
-
 def matchRules(x, dfRuleSet):
     if not dfRuleSet.empty:
         for i, row in dfRuleSet.iterrows():

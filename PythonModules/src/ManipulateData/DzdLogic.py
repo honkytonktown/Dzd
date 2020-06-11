@@ -10,112 +10,87 @@
 import re
 import pandas as pd
 
+#setResponse, if there is a matching rule set, applies new inequality comparisons
+#to value. It compares existing value to appropriate value determined in dzd rules
 def setResponse(value, dfRuleSet):
     if not dfRuleSet.empty:
-        susceptible = float(dfRuleSet['susceptible'].values[0])
-        intermediatelow = float(dfRuleSet['intermediatelow'].values[0])
-        intermediatehigh = float(dfRuleSet['intermediatehigh'].values[0])
-        resistant = float(dfRuleSet['resistant'].values[0])
-        if (value <= susceptible):
+        if (value <= float(dfRuleSet['susceptible'].values[0])):
             return responses[0]
-        elif(value > intermediatelow and value < intermediatehigh):
+        elif(value > float(dfRuleSet['intermediatelow'].values[0]) and value < float(dfRuleSet['intermediatehigh'].values[0])):
             return responses[1]
-        elif(value >= resistant):
+        elif(value >= float(dfRuleSet['resistant'].values[0])):
             return responses[2]
     #if there is no rule set, return there is no match
     else:
         return responses[3]
 
+#extractNum runs regex pattern against value to extract any number
 def extractNum(value):
-    #print(value)
-    #this regex finds integers and floats in provided string
-    numValue = re.search(r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?', value).group(1)
-    if numValue is not None:
-        return numValue
-    else: 
-        #This should not happen
-        return "NaN"
+    try:
+        numValue = re.search(r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?', value).group(1)
+        if numValue is not None:
+            return float(numValue)
+    except: 
+        msg = "Failed to find numerical value within: {}".format(value)
+        return (msg)
 
+#<4 returns 4 from extractNum, so need to reduce value slightly
+#for inequality to remain true - (ie. 4 < 4 is false, but 3.99 < 4 is not)
 def lessThan(value, dfRuleSet):
     temp = extractNum(value)
-    tempF = float(temp)
-    #<4 returns 4, so need to reduce value slightly
-    #for inequality to remain true (ie. 4 < 4 is false)
-    tempF = tempF - 0.01  
-    return setResponse(tempF, dfRuleSet)
+    temp -= 0.01  
+    return setResponse(temp, dfRuleSet)
 
+#>4 returns 4 from extractNum, so need to bump value slightly
+#for inequality to remain true
 def greaterThan(value, dfRuleSet):
     temp = extractNum(value)
-    tempF = float(temp)
-    #>4 returns 4, so need to bump value slightly
-    #for inequality to remain true
-    tempF = tempF + 0.01  
-    return setResponse(tempF, dfRuleSet)     
+    temp += 0.01  
+    return setResponse(temp, dfRuleSet)     
 
-def lessThanOrEqual(value, dfRuleSet):
+#simpleHandler handles regex patterns that don't require modification
+def simpleHandler(value, dfRuleSet):
     temp = extractNum(value)
-    tempF = float(temp)
-    return setResponse(tempF, dfRuleSet)
+    return setResponse(temp, dfRuleSet)
 
-def greaterThanOrEqual(value, dfRuleSet):
-    temp = extractNum(value)
-    tempF = float(temp)
-    return setResponse(tempF, dfRuleSet)  
+responses = ["Susceptible", "Intermediate", "Resistant", "No matching rule", "Value has no nums"] 
 
-def numWithUnits(value, dfRuleSet):
-    temp = extractNum(value)
-    tempF = float(temp)
-    return setResponse(tempF, dfRuleSet) 
-
-def funcMap(value, id, dfRuleSet):
+#mapper assigns a function to the regex pattern
+#original matching function was part of list w/ the regex pattern
+#but functions were being executed when the list was declared,
+#slowing down the process
+def mapper(id, value, dfRuleSet):
     if id == 0:
-        response = lessThanOrEqual(value, dfRuleSet)
-        return response
+        return simpleHandler(value, dfRuleSet)
     elif id == 1:
-        response = greaterThanOrEqual(value, dfRuleSet)
-        return response
+        return lessThan(value, dfRuleSet)
     elif id == 2:
-        response = lessThan(value, dfRuleSet)
-        return response
-    elif id == 3:
-        response = greaterThan(value, dfRuleSet)
-        return response 
-    elif id == 4:
-        response = numWithUnits(value, dfRuleSet)
-        return response
+        return greaterThan(value, dfRuleSet)
 
-responses = ["Susceptible", "Intermediate", "Resistant", "No matching rule", "Value has no nums"]
-
-#common 'value' formats
-regexArray = [
-    [re.compile(r'(<=.*)'), 0],
-    [re.compile(r'(>=.*)'), 1],
-    [re.compile(r'<(\?!=)'), 2],
-    [re.compile(r'>(\?!=)'), 3],
-    [re.compile(r'(?=.*ug.*)'), 4]
-]
-
+#applyLogic deduce 'value' column through series of steps.
+#Values containing only strings are returned immediately.
+#Values that are just numbers jump to
 def applyLogic(value, organism, method, antibiotic, dfRules):
-    #selecting appropriate rule for the current row
     dfRuleSet = dfRules.loc[(dfRules['organism'] == organism) & (dfRules['antibiotic'] == antibiotic) & (dfRules['method'] == method)]
-    # if not dfRuleSet.empty:
-    #     print (dfRuleSet)
-    #if str contains no nums return immediately
     if value.isalpha():
         return responses[4]
-    #if str contains only nums jump to setResponse
-    if value.isnumeric():
-        temp = extractNum(value)
-        tempF = float(temp)
-        response = setResponse(tempF, dfRuleSet)
-        return setResponse(tempF, dfRuleSet)
 
-    #regex[0] is regex pattern
-    #regex[1] is mapper identification num
-    for regex in regexArray:
-        n = regex[0].match(value)
-        if (type(n) == re.Match):
-            return funcMap(value, regex[1], dfRuleSet)
+    elif value.isnumeric():
+        return simpleHandler(value, dfRuleSet)
+
+    #Logic: if string match regex pattern, call corresponding function
+    #these could be refined more by combining the three that work the same way
+    regexArray = [
+                [re.compile(r'(<=.*)'), 0],
+                [re.compile(r'(>=.*)'), 0],
+                [re.compile(r'<(\?!=)'), 1],
+                [re.compile(r'>(\?!=)'), 2],
+                [re.compile(r'(?=.*ug.*)'), 0]
+                ]
+    for regexPair in regexArray:
+        temp = regexPair[0].match(value)
+        if (type(temp) == re.Match):
+            return mapper(regexPair[1], value, dfRuleSet)
 
     return "Did not match any regex"
 

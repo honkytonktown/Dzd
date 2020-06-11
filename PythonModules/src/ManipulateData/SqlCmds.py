@@ -21,3 +21,9 @@ CREATE TABLE public."DzdRules"
 
 TABLESPACE pg_default;
 """
+
+validationTest = """
+SELECT sampid, organism, test, antibiotic, value, antibioticinterpretation, method, dzdinterpretation
+	FROM public."AggregateTests"
+	WHERE organism like 'Escherichia coli' AND antibiotic LIKE 'Ceftazidime' AND method like 'VITEK II'
+"""

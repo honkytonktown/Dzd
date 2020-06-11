@@ -11,21 +11,28 @@ import ManipulateData.SqlCmds as SqlCmds
 #the additional dzdinterpretation column
 def insertData(row):
     cur = config.conn.cursor()
-    SQLInsert = """ INSERT INTO public."AggregateTests"(sampid, organism, test, antibiotic, value, antibioticinterpretation, method, dzdinterpretation) VALUES (%s, %s, %s, %s, %s, %s, %s, %s); """
+    SQLInsert = """ 
+    INSERT INTO public."AggregateTests"
+    (sampid, organism, test, antibiotic, value, antibioticinterpretation, method, dzdinterpretation) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s); 
+    """
     data = (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
     cur.execute(SQLInsert, data) 
     config.conn.commit()
 
+#getModifiedData is used when a dzdinterpretation columna already exists
 def getModifiedData(): 
     SQLSelect = pd.read_sql_query(""" SELECT * FROM public."AggregateTests" """, config.conn)
     df = pd.DataFrame(SQLSelect, columns=['sampid', 'organism','test','antibiotic','value', 'antibioticinterpretation', 'method', 'dzdinterpretation'])
     return df
+
 #getData pulls data from sql table for manipulation
 def getData():
     SQLSelect = pd.read_sql_query(""" SELECT * FROM public."AggregateTests" """, config.conn)
     df = pd.DataFrame(SQLSelect, columns=['sampid', 'organism','test','antibiotic','value', 'antibioticinterpretation', 'method' ])
     return df
 
+#getDzdRules pulls dzd rules from specified SQL table
 def getDzdRules():
     SQLSelect = pd.read_sql_query(""" SELECT * FROM public."DzdRules" """, config.conn)
     dfRules = pd.DataFrame(SQLSelect, columns=['organism', 'susceptible', 'intermediatelow', 'intermediatehigh', 'resistant', 'antibiotic', 'method'])
@@ -69,7 +76,7 @@ def pushData(df):
 def dataHandler(mode):
     #pd.set_option('display.max_rows', None)
 
-    #pull modified data, dont push back
+    #pull modified data, dont push back to SQL
     if (mode == 0):
         df = getData()
         dfRules = getDzdRules()
@@ -79,7 +86,7 @@ def dataHandler(mode):
         print(df)
         config.CloseConnection()
 
-    #pull modified data, push back
+    #pull modified data, push back to SQL
     elif (mode == 1):
         df = getModifiedData()
         dfRules = getDzdRules()
@@ -90,19 +97,17 @@ def dataHandler(mode):
         pushData(df)
         config.CloseConnection()
 
-    #pull original data, push back
+    #pull unmodified data, push back to SQL
     elif(mode == 2):
         df = getData()
         dfRules = getDzdRules()
         print("Dataframe column names: ")
         print(df.columns.values)
-        print("Creating new column with Dzd modification...")
-        generateDzdValues(df, dfRules)
-        alterTable()
         generateDzdValues(df, dfRules)
         print("Modified dataframe column names: ")
         print(df.columns.values)
         clearTable()
+        alterTable()
         pushData(df)
         config.CloseConnection()
     #pd.set_option('display.max_rows', None)
