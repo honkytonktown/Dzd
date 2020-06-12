@@ -1,4 +1,4 @@
-# Dzd project: Overview
+# DZD project: Overview
 
 ## SQL Tables:
 PhenotypeData and CollectionsData are basically copies of the csv data, with applied formatting.
