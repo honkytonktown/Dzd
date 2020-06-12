@@ -1,5 +1,7 @@
 # DZD project: Overview
 
+Note: to install packages run pip3 install -r requirements.txt in src folder
+
 ## SQL Tables:
 PhenotypeData and CollectionsData are basically copies of the csv data, with applied formatting.
 
