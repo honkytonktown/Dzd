@@ -1,6 +1,6 @@
 # DZD Project
-Raw data can be found in /OrginalCsv
-Final output can be found in /GeneratedCsv
-All python modules can be found in /PythonModules
-./Notes has assessment notes
-./ReadMeForOverview attempts to outline project
+Raw data can be found in /OrginalCsv <br />
+Final output can be found in /GeneratedCsv <br />
+All python modules can be found in /PythonModules <br />
+./Notes has assessment notes <br />
+./ReadMeForOverview attempts to outline project <br />
