@@ -3,8 +3,8 @@ import psycopg2
 #define postgre db config
 hostname = 'localhost'
 username = 'postgres'
-password = 'somepassword'
-database = 'GenomeData'
+password = 'joe'
+database = 'DzdProject'
 port = 5432
 msg = ("Connecting to database: host: {}, port: {}, dbname: {}").format(hostname, port, database)
 print (msg)

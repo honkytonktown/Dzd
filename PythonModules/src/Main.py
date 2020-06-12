@@ -10,8 +10,8 @@ import Config.Config as config
 phenoCSV = ""
 collCSV = ""
 #normally you'd pass these in via cmd line
-phenoCSV = 'C:\\path\\to\\PhenotypeData.csv'
-collCSV = 'C:\\path\\to\\CollectionsData.csv'
+phenoCSV = '/home/joe/Desktop/dzd/OriginalCSV/PhenotypeData.csv'
+collCSV = '/home/joe/Desktop/dzd/OriginalCSV/CollectionsData.csv'
 
 #setupRules creates sql tables to hold data rules that are applied later
 #mode - 0 = print rules, 1 = insert rules, 2 = createtable + insert

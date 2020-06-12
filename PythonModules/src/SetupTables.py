@@ -59,13 +59,13 @@ def createResistance():
 def tableHandler(mode):
     print("Generating SQL tables...")
     if (mode == 1):
-        #createMain()
+        createMain()
         #MainAggregate needs to be built before
         #MainNull because it builds from it
-        #createMainAggregate()
-        #createMainNull()
+        createMainAggregate()
+        createMainNull()
         createAggregate()
-       # createResistance()
+        createResistance()
         print("Done generating SQL tables")
     else: 
         msg = "The mode is set to {}".format(mode)
