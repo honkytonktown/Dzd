@@ -23,7 +23,7 @@ OrganismResistance, DzdRules, MatchingRules could be used for multiple datasets.
 ## Modules:
 Main.py contains the basic sequence of events.<br />
 
-setupRules:
+setupRules: <br />
 Create tables to insert DZD interpretations and formatting rules -- <br />
 DZD interpretation table is used in manipulateData. <br />
 Formatting rules are used on initial CSV import. <br />
