@@ -3,15 +3,17 @@ import psycopg2
 #define postgre db config
 hostname = 'localhost'
 username = 'postgres'
-password = 'joe'
-database = 'DzdProject'
+password = 'Listennow55'
+database = 'GenomeData'
 port = 5432
 msg = ("Connecting to database: host: {}, port: {}, dbname: {}").format(hostname, port, database)
 print (msg)
 #Provides a connection to postgre server. Used throughout the program
+#try catch me
 conn = psycopg2.connect( host=hostname, port = port, user=username, password=password, dbname=database )
 
-#CloseConnection closes postgres db connection
-def CloseConnection(): 
+
+def close_connection(): 
+    """ close_connection closes postgres db connection """
     conn.close()
 

@@ -6,8 +6,9 @@ import pandas as pd
 import psycopg2
 import Tables.CreateMatchRules as MRtable
 
-#createDataTable creates SQL table that will hold data matching rules
-def createDataTable():
+
+def create_data_table():
+    """ createDataTable creates SQL table that will hold data matching rules """
     cur = config.conn.cursor()
     cmd = MRtable.createTable
     try:
@@ -17,8 +18,9 @@ def createDataTable():
         print(err)
         config.conn.rollback()
 
-#insertData inserts data into data matching table
-def insertData(row):
+
+def insert_data(row):
+    """ insert_data inserts data into data matching table """
     cur = config.conn.cursor()
     SQLInsert = """ INSERT INTO public."MatchingRules"(columnname, replacementphrase, regexpattern) VALUES (%s, %s, %s); """
     data = (row[0], row[1], row[2])
@@ -30,17 +32,17 @@ def insertData(row):
         config.conn.rollback()
         
 
-#pushData iterates over df rows and calls insertData
-#to insert them into SQL table
-def pushData(df):
+def push_data(df):
+    """ push_data iterates over df rows and calls insert_data
+        to insert them into SQL table """
     for i, row in df.iterrows():
-        insertData(row)
+        insert_data(row)
 
-#pushMatchingRules defines and then handles data matching rules.
-#These rules are stored and then pulled when formatting CSV data later
-#As wil the DZD rules table, you'd want to define these elsewhere in 
-#production
-def pushMatchingRules(mode): 
+def push_matching_rules(mode): 
+    """ pushMatchingRules defines and then handles data matching rules.
+        These rules are stored and then pulled when formatting CSV data later
+        As wil the DZD rules table, you'd want to define these elsewhere in 
+        production """
     print("Setting up data matching rules...")
     #You'd probably want a different insertion method,
     #but of that implementation would be easy.
@@ -56,9 +58,9 @@ def pushMatchingRules(mode):
     if(mode == 0):
         print(df)
     elif(mode == 1):
-        pushData(df)
+        push_data(df)
     elif(mode == 2):
-        createDataTable()
-        pushData(df)
+        create_data_table()
+        push_data(df)
     print("Done setting up data rules table")
     

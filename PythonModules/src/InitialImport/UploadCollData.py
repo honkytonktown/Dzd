@@ -8,33 +8,34 @@ import pandas as pd
 import Tables.CreateCollData
 import DataHelper.DataHelperColl as dhc
 
-#insertData receives a row and inserts it into sql table
-def insertData(row, Columns):
+def insert_data(row, Columns):
+    """ insert_data receives a row and inserts it into sql table """
     cur = config.conn.cursor()
     SQLInsert = """ INSERT INTO public."CollectionsData"({}, {}, {}, {}) VALUES (%s, %s, %s, %s); """.format(Columns[0], Columns[1], Columns[2], Columns[3])
     data = (row[0], row[1], row[2], row[3])
     cur.execute(SQLInsert, data) 
     config.conn.commit()
 
-#pushData iterates over df rows and calls insertData
-#to insert them into sql table
-def pushData(df, Columns):
+def push_data(df, Columns):
+    """ push_data iterates over df rows and calls insertData
+        to insert them into sql table """
     for i,row in df.iterrows():
-        insertData(row, Columns)
+        insert_data(row, Columns)
 
-#createTable creates a table for the data to be pushed to
-def createTable(df):
+def create_table(df):
+    """ create_table creates a table for the data to be pushed to """
     cur = config.conn.cursor()
     cmd = Tables.CreateCollData.createTable
     cur.execute(cmd)
     config.conn.commit()
 
-#clctDataHandler is main func of this module
-#if mode == 1, it will read, format csv and push the data to a sql table
-#if mode == 0 itll read, format and print csv data
-def collDataHandler(mode, CsvPath):
-    print("Uploading CollectionsData...")
-    msg = "The clctDataHandler is set to mode: {}".format(mode)
+
+def coll_data_handler(mode, CsvPath):
+    """ coll_data_handler is main func of this module
+        if mode == 1, it will read, format csv and push the data to a sql table
+        if mode == 0 itll read, format and print csv data
+    print("Uploading CollectionsData...") """ 
+    msg = "The coll_data_handler is set to mode: {}".format(mode)
     print (msg)
 
     try: 
@@ -51,7 +52,7 @@ def collDataHandler(mode, CsvPath):
     print(Columns)
 
     print("Formating data...")
-    df = dhc.dataHandlerColl(df)
+    df = dhc.data_handler_coll(df)
     print("New dataframe column names: ")
     print(df.columns.values)
 
@@ -59,9 +60,9 @@ def collDataHandler(mode, CsvPath):
         print(df)
     elif (mode == 1):
         print("Creating table...")
-        createTable(df)
+        create_table(df)
         print("Pushing data to SQL db...")
-        pushData(df, Columns)
+        push_data(df, Columns)
     print("Done uploading CollectionsData")
 
     

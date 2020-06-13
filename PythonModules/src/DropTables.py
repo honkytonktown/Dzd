@@ -22,7 +22,7 @@ def delete():
         print(err)
         config.conn.rollback()
 
-def deleteAllTables(mode):
+def delete_all_tables(mode):
     if mode == 1:
         delete()
 

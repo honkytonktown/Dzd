@@ -5,8 +5,8 @@ import Tables.CreateMainTables as mt
 import Tables.CreateOrganismResistance as ogr
 import Config.Config as config
 
-#createMain creates table w/ sampid, organism, unique values
-def createMain():
+def create_main():
+    """ create_main creates table w/ sampid, organism, unique values """ 
     cur = config.conn.cursor()
     cmd = mt.MainTable
     cur.execute(cmd)
@@ -14,9 +14,9 @@ def createMain():
     cur.execute(cmInsert)
     config.conn.commit()
 
-#createMainAggregate creates table w/ sampid, organism for every match (duplicate sampids)
-#This table may be dropped as it's not essential
-def createMainAggregate():
+def create_main_aggregate():
+    """ create_main_aggregate creates table w/ sampid, organism for every match (duplicate sampids)
+        This table may be dropped as it's not essential """ 
     cur = config.conn.cursor()
     cmd = mt.MainTableAgg
     cur.execute(cmd)
@@ -24,9 +24,9 @@ def createMainAggregate():
     cur.execute(cmInsert)
     config.conn.commit()
 
-#createMainNulls creates table w/ sampid, organism (with null organisms)
-#This table is full of sampids that didn't match anything in the phenotype data set
-def createMainNull():
+def create_main_null():
+    """ createMainNulls creates table w/ sampid, organism (with null organisms)
+        This table is full of sampids that didn't match anything in the phenotype data set """ 
     cur = config.conn.cursor()
     cmd = mt.MainTableNulls
     cur.execute(cmd)
@@ -34,9 +34,9 @@ def createMainNull():
     cur.execute(cmInsert)
     config.conn.commit()
 
-#createAggregate creates table w/ sampid matched with every test
-#its corresponding hid/isolate aligns with
-def createAggregate():
+def create_aggregate():
+    """ create_aggregate creates table w/ sampid matched with every test
+        its corresponding hid/isolate aligns with """
     cur = config.conn.cursor()
     cmd = agt.CreateTable
     cur.execute(cmd)
@@ -44,9 +44,9 @@ def createAggregate():
     cur.execute(cmInsert)
     config.conn.commit()
 
-#createResistance creates table w/ organisms and the tests/results
-#that have been run against them.
-def createResistance():
+def create_resistance():
+    """ create_resistance creates table w/ organisms and the tests/results
+        that have been run against them. """
     cur = config.conn.cursor()
     cmd = ogr.CreateTable
     cur.execute(cmd)
@@ -54,18 +54,18 @@ def createResistance():
     cur.execute(cmInsert)
     config.conn.commit()
 
-#tableHandler generates SQL tables if enabled
-#Tables can be found in the tables folder
-def tableHandler(mode):
+def table_handler(mode):
+    """ table_handler generates SQL tables if enabled
+        Tables can be found in the tables folder """ 
     print("Generating SQL tables...")
     if (mode == 1):
-        createMain()
+        create_main()
         #MainAggregate needs to be built before
         #MainNull because it builds from it
-        createMainAggregate()
-        createMainNull()
-        createAggregate()
-        createResistance()
+        create_main_aggregate()
+        create_main_null()
+        create_aggregate()
+        create_resistance()
         print("Done generating SQL tables")
     else: 
         msg = "The mode is set to {}".format(mode)
